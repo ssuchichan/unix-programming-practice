@@ -13,6 +13,7 @@ void* task(void* arg) {
     int fd = (int)arg;
     while(1) {
         char buf[256];
+        //int n = read(fd, buf, sizeof(buf)-1);
         int n = recv(fd, buf, sizeof(buf)-1, 0);
         if (n < 0) {
             perror("recv");

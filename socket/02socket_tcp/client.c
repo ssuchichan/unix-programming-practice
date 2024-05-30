@@ -38,6 +38,7 @@ int main(int argc, char* argv[]) {
         if (!strcmp(buf, "quit\n")){
             break;
         }
+        //int ret = write(sockfd, buf, strlen(buf)-1);
         int ret = send(sockfd, buf, strlen(buf)-1, 0);
         if (ret < 0) {
             perror("write");

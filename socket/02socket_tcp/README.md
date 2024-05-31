@@ -7,7 +7,7 @@
 
 
 ## select
-非阻塞系统调用，用单个线程为多个客户端提供服务。通过select监控多个客户端套接字，选择处理其中“活跃的”连接，服务器通过高速处理方式可以为多个
+非阻塞系统调用，用单个线程为多个客户端提供服务。通过select监控多个客户端套接字，选择处理其中“活跃”的连接，服务器通过高速处理方式可以为多个
 客户端提供服务，不需开多个线程。
 * 优点：降低了服务器负荷，提高了资源利用率
 * 缺点：
@@ -20,8 +20,36 @@
   * 判断找出活跃连接，对其进行处理
 
 ## epoll
-select的增强版 
-
+select的增强版，服务端采用单个线程为多个客户端提供服务。对多个客户端的连接进行监控，处理“活跃”的连接，可直接处理，可同时监控套接字和多个通信连接。
+* 优点：可以监听和处理百万级的连接，相比select系统调用，epoll返回的是活跃的连接，不需要遍历，提高了效率。
+* 缺点：没有提供一对一服务，一对多服务，处理每次请求时间较长，会使得其他请求得不到及时处理。
+* 编程模型
+  ```
+  #include <sys/epoll.h>
+  
+  // 创建epoll实例，size要大于0
+  int epoll_create(int size);
+  
+  int epoll_create1(int flags);
+  
+  int epoll_ctl(
+      int                  epfd, 
+      int                  op, 
+      int                  fd, 
+      struct epoll_event*  event
+  );
+  
+  int epoll_wait(
+      int                  epfd, 
+      struct epoll_event*  events, 
+      int                  maxevents, 
+      int                  timeout
+  );
+  ```
+  * 创建epollfd
+  * 向epollfd添加要监控的套接字
+  * 监控套接字
+  * 处理活跃的套接字
 
 ## 线程池技术
 

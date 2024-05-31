@@ -3,9 +3,12 @@ project(02socket_tcp C)
 
 set(CMAKE_C_STANDARD 11)
 
-add_executable(client client.c)
+add_executable(client client.c
+)
 
-add_executable(server server.c)
+add_executable(server_multi_thread server_multi_thread.c)
+add_executable(server_multi_process server_multi_process.c)
 
+add_executable(server_select server_select.c)
 
 

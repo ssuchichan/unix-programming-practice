@@ -4,13 +4,12 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 #include <pthread.h>
 
 void* task(void* arg) {
-    int fd = (int)arg;
+    int fd = *(int*)arg;
     while(1) {
         char buf[256];
         //int n = read(fd, buf, sizeof(buf)-1);
@@ -19,13 +18,15 @@ void* task(void* arg) {
             perror("recv");
             pthread_exit((void*)-1);
         }
-        if (n == 0) {
-            printf("client closed: %d\n", fd);
-            pthread_exit(NULL);
-        }
         buf[n] = '\0';
         printf("%ld: [%d]<<<<<<: %s\n", pthread_self(), n, buf);
+        if (!strcmp(buf, "quit")) {
+            printf("client closed: %d\n", fd);
+            break;
+        }
     }
+
+    close(fd);
     pthread_exit(NULL);
 }
 
@@ -62,10 +63,12 @@ int main(int argc, char* argv[]) {
         printf("new connect: %s:%hu, fd = %d\n",inet_ntoa(client_addr.sin_addr), ntohs(client_addr.sin_port), conn);
 
         pthread_t tid;
-        pthread_create(&tid, NULL, task, (void*)conn);
+        if (pthread_create(&tid, NULL, task, &conn) != 0) {
+            printf("pthread_create error\n");
+            return -1;
+        }
     }
 
     close(sockfd);
-
     return 0;
 }

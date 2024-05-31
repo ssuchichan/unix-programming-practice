@@ -4,9 +4,7 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include <sys/socket.h>
-#include <sys/types.h>
 
 
 int main(int argc, char* argv[]) {
@@ -35,16 +33,15 @@ int main(int argc, char* argv[]) {
         char buf[256];
         bzero(buf, sizeof(buf));
         fgets(buf, sizeof(buf), stdin);
-        if (!strcmp(buf, "quit\n")){
-            break;
-        }
         //int ret = write(sockfd, buf, strlen(buf)-1);
         int ret = send(sockfd, buf, strlen(buf)-1, 0);
         if (ret < 0) {
             perror("write");
             return -1;
         }
-        printf("write: %d bytes\n", ret);
+        if (!strcmp(buf, "quit\n")){
+            break;
+        }
     }
 
     close(sockfd);

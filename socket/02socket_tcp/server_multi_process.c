@@ -17,7 +17,7 @@ void task(int fd) {
         }
         buf[n] = '\0';
         printf("[pid=%d] [%d]<<<<<: %s\n", getpid(), n, buf);
-        if (!strcmp(buf, "quit\0")) {
+        if (!strcmp(buf, "quit")) {
             break;
         }
     }

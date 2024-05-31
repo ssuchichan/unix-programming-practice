@@ -5,7 +5,6 @@
 #include <arpa/inet.h>
 #include <stdlib.h>
 #include <string.h>
-#include <fcntl.h>
 #include <sys/socket.h>
 #include <sys/types.h>
 
@@ -54,11 +53,10 @@ int main(int argc, char* argv[]) {
     int client_fd[MAX_FD_NUM] = {0};
     client_fd[0] = sockfd;
     fd_set client_set;
-
+    FD_ZERO(&client_set);
     char buf[256];
     while(1) {
         int maxfd = 0;
-        FD_ZERO(&client_set);
         for (int i = 0; i < MAX_FD_NUM; ++i) {
             if (client_fd[i] > 0) {
                 FD_SET(client_fd[i], &client_set);
@@ -67,7 +65,7 @@ int main(int argc, char* argv[]) {
                 }
             }
         }
-        printf("%d %d %d %d %d maxfd = %d\n", client_fd[0], client_fd[1], client_fd[2], client_fd[3], client_fd[4], maxfd);
+
         if (select(maxfd + 1, &client_set, NULL, NULL, NULL) < 0) {
             perror("select");
             return -1;
@@ -83,6 +81,7 @@ int main(int argc, char* argv[]) {
                         perror("accept");
                         return -1;
                     }
+                    printf("new connection: %d\n", conn);
                     add_fd(conn, client_fd);
                 }
                 else {
@@ -93,8 +92,9 @@ int main(int argc, char* argv[]) {
                     }
                     buf[n] = '\0';
                     printf("fd=%d, [%d]<<<<<<: %s\n", client_fd[i], n, buf);
-                    if (!strcmp(buf,"quit\0")) {
+                    if (!strcmp(buf,"quit")) {
                         close(client_fd[i]);
+                        FD_CLR(client_fd[i], &client_set);
                         remove_fd(client_fd[i], client_fd);
                     }
                 }

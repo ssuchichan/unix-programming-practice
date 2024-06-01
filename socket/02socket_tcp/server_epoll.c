@@ -84,7 +84,7 @@ int main(int argc, char* argv[]) {
                 printf("fd = %d, [%d]<<<<<<: %s\n", fd, n, buf);
                 if (!strcmp(buf, "quit")) {
                     // 移除监控
-                    if (epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, &ev) == -1) {
+                    if (epoll_ctl(epollfd, EPOLL_CTL_DEL, fd, NULL) == -1) {
                         perror("epoll_ctl: del");
                         return -1;
                     }
